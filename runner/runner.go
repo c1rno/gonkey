@@ -67,6 +67,7 @@ func (r *Runner) Run() (*models.Summary, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer client.CloseIdleConnections()
 
 	totalTests := 0
 	failedTests := 0
@@ -150,7 +151,9 @@ func (r *Runner) executeTest(v models.TestInterface, client *http.Client) (*mode
 	if err != nil {
 		return nil, err
 	}
-	_ = resp.Body.Close()
+	if err = resp.Body.Close(); err != nil {
+		return nil, err
+	}
 
 	bodyStr := string(body)
 
